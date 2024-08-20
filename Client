@@ -1,0 +1,47 @@
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
+#include <sys/socket.h>
+#include <netinet/in.h>
+#include <time.h>
+
+int main(){
+    struct sockaddr_in sa, cli;
+    int n, sockfd, ch, connfd;
+    char buff[50];
+    time_t tick;
+    
+    // Creating socket
+    sockfd = socket(AF_INET, SOCK_STREAM, 0);
+    if(sockfd < 0){
+        printf("\nFailed to connect to socket");
+        exit(0);
+    } else {
+        printf("\nSocket is opened");
+    }
+    
+    // Establising connection
+    bzero(&sa, sizeof(sa));
+    sa.sin_family = AF_INET;
+    sa.sin_port = htons(8080);
+    if(connect(sockfd, (struct sockaddr*)&sa, sizeof(sa)) < 0){
+        printf("\nConnection failed!");
+        exit(0);
+    } else{
+        printf("\nConnection established");
+    }
+    
+    // Sending message
+    listen(sockfd, 50);
+    for(;;){
+        n = sizeof(ch);
+        connfd = accept(sockfd, (struct sockaddr*)&cli, sizeof(sa));
+        printf("Accepted");
+        tick = time(NULL);
+        snprintf(buff, sizeof(buff), "%s", ctime(&tick));
+        printf("%s", buff);
+        write(connfd, buff, 100);
+    }
+    
+    return 0;
+}
